@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SysService {
-
   findAll() {
     return `This action returns all sys`;
   }

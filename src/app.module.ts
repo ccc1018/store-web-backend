@@ -6,7 +6,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SysModule } from './sys/sys.module';
 import { UserModule } from './user/user.module';
 import { LoggerModule } from './common/logger/logger.module';
-import { RedisModule } from './common/redis/redis.module';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionsFilter } from './common/http-exceptions/http-exceptions.filter';
 @Module({
@@ -29,7 +28,7 @@ import { HttpExceptionsFilter } from './common/http-exceptions/http-exceptions.f
           autoLoadEntities: true,
           //自动同步数据库结构
           synchronize: true,
-        }
+        };
       },
     }),
     ConfigModule.forRoot({
@@ -39,10 +38,12 @@ import { HttpExceptionsFilter } from './common/http-exceptions/http-exceptions.f
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService,
+  providers: [
+    AppService,
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionsFilter
-    }],
+      useClass: HttpExceptionsFilter,
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}

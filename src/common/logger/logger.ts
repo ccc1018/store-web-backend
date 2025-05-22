@@ -35,11 +35,23 @@ export class Logger implements LoggerService {
             // 颜色
             format.colorize(),
             // 日志格式
-            format.printf(({ context, level, message, timestamp }) => {
-              const appStr = chalk.green(`[NEST]`);
-              const contextStr = chalk.yellow(`[${context}]`);
-              return `${appStr} ${timestamp} ${level} ${contextStr} ${message} `;
-            }),
+            format.printf(
+              ({
+                context,
+                level,
+                message,
+                timestamp,
+              }: {
+                context: string;
+                level: string;
+                message: string;
+                timestamp: string;
+              }) => {
+                const appStr = chalk.green(`[NEST]`);
+                const contextStr = chalk.yellow(`[${context}]`);
+                return `${appStr} ${timestamp} ${level} ${contextStr} ${message} `;
+              },
+            ),
           ),
         }),
         new transports.DailyRotateFile({
@@ -58,7 +70,7 @@ export class Logger implements LoggerService {
           //格式定义，同winston
           format: format.combine(
             format.timestamp({
-              format: 'YYYY-MM-DD HH:mm:ss'
+              format: 'YYYY-MM-DD HH:mm:ss',
             }),
             format.json(),
           ),
@@ -81,8 +93,8 @@ export class Logger implements LoggerService {
           ),
           level: 'error',
         }),
-      ]
-    })
+      ],
+    });
   }
   log(message: string, context: string) {
     const timestamp = dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss');
@@ -98,6 +110,6 @@ export class Logger implements LoggerService {
   }
   warn(message: string, context: string) {
     const timestamp = dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-    this.logger.warn(message, { context, timestamp })
+    this.logger.warn(message, { context, timestamp });
   }
 }

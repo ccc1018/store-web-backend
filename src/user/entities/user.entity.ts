@@ -1,10 +1,10 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('store_user')
 export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
   @Column({ type: 'varchar', length: 32, comment: '用户登录账号' })
-  username: string
+  username: string;
   @Column()
   password: string;
   salt: string;

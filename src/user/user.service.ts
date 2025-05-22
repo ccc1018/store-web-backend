@@ -7,25 +7,28 @@ import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 @Injectable()
 export class UserService {
-
   @InjectRepository(UserEntity)
   private userRepository: Repository<UserEntity>;
   login(loginUserDto: LoginUserDto) {
-    return 'This action logins a user'
+    return loginUserDto;
   }
   async registry(createUserDto: CreateUserDto) {
     const { username, email } = createUserDto;
 
     //1.判断用户是否存在，参数为邮箱或者用户名查询，使用createQueryBuilder一次性查询两个字段
-    const user = await this.userRepository.createQueryBuilder('su')
-      .where("su.username = :username OR su.email = :email", { username, email })
+    const user = await this.userRepository
+      .createQueryBuilder('su')
+      .where('su.username = :username OR su.email = :email', {
+        username,
+        email,
+      })
       .getOne();
     //2.存在则返回错误信息
     if (user) {
       throw new HttpException(
         '用户名或注册邮箱已存在，请重新输入',
-        HttpStatus.CONFLICT
-      )
+        HttpStatus.CONFLICT,
+      );
     }
     //3.校验注册验证码
     // const codeRedDisKey = getRedisKey(
@@ -38,7 +41,7 @@ export class UserService {
     // }
   }
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    return createUserDto;
   }
 
   findAll() {
@@ -50,7 +53,10 @@ export class UserService {
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    console.log(
+      `Updating user ${id} with data: ${JSON.stringify(updateUserDto)}`,
+    );
+    return 1;
   }
 
   remove(id: number) {

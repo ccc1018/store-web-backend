@@ -8,4 +8,4 @@ import { UserModule } from 'src/user/user.module';
   controllers: [SysController],
   providers: [SysService],
 })
-export class SysModule { }
+export class SysModule {}

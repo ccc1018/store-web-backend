@@ -3,6 +3,6 @@ import { Logger } from './logger';
 
 @Module({
   providers: [Logger],
-  exports: [Logger]
+  exports: [Logger],
 })
-export class LoggerModule { }
+export class LoggerModule {}

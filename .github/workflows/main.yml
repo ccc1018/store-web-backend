@@ -1,4 +1,4 @@
-name: Deploy Next.js to Alibaba Cloud ECS
+name: nest.js
 
 on:
   push:

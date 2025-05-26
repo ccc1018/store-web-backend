@@ -65,10 +65,10 @@ jobs:
               # 删除可能存在的空目录内容
               rm -rf /home/interview-guide/*
               # 使用 SSH 方式克隆
-              git clone git@github.com:xun082/interview-guide.git .
+              git clone git@github.com:ccc1018/store-web-backend.git .
             else
               # 确保远程 URL 使用 SSH
-              git remote set-url origin git@github.com:xun082/interview-guide.git
+              git remote set-url origin git@github.com:ccc1018/store-web-backend.git
               # 获取最新代码
               git fetch origin main
               git reset --hard origin/main

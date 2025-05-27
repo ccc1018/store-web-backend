@@ -10,17 +10,18 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
+// limitations under the License.
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class LoginUserDto {
-  @ApiProperty({ required: true, description: '用户名', example: 'test' })
-  @IsNotEmpty({ message: '账号不能为空' })
-  username: string;
-
-  @ApiProperty({ required: true, description: '密码', example: '123456' })
-  @IsNotEmpty({ message: '密码不能为空' })
-  @Length(5, 20, { message: '密码长度在5-20之间' })
-  password: string;
+export class RegistryEmailDto {
+  @ApiProperty({
+    required: true,
+    description: '邮箱',
+    default: '123456@qq.com',
+  })
+  @IsNotEmpty({ message: '邮箱不能为空' })
+  @IsEmail({}, { message: '邮箱格式不正确' })
+  email: string;
 }

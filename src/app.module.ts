@@ -6,8 +6,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SysModule } from './sys/sys.module';
 import { UserModule } from './user/user.module';
 import { LoggerModule } from './common/logger/logger.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionsFilter } from './common/http-exceptions/http-exceptions.filter';
+import { ResponseInterceptor } from './common/response/response.interceptor';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { PermissionGuardGuard } from './auth/permission-guard/permission-guard.guard';
+import { RoleModule } from './role/role.module';
+// import { MailService } from './mail/mail.service';
 @Module({
   imports: [
     LoggerModule,
@@ -27,7 +32,7 @@ import { HttpExceptionsFilter } from './common/http-exceptions/http-exceptions.f
           //自动加载实体类
           autoLoadEntities: true,
           //自动同步数据库结构
-          synchronize: true,
+          synchronize: false,
         };
       },
     }),
@@ -36,14 +41,32 @@ import { HttpExceptionsFilter } from './common/http-exceptions/http-exceptions.f
     }),
     SysModule,
     UserModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    // 应用过滤器
     {
       provide: APP_FILTER,
       useClass: HttpExceptionsFilter,
     },
+    //应用拦截器
+    {
+      provide: 'APP_INTERCEPTOR',
+      useClass: ResponseInterceptor,
+    },
+    //应用jwt登录状态验证守卫
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    // 应用接口权限验证守卫
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuardGuard,
+    },
+    // MailService,
   ],
 })
 export class AppModule {}

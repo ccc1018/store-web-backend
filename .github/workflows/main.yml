@@ -20,6 +20,7 @@ jobs:
 
       - name: Install pnpm
         run: npm install -g pnpm@9.4.0
+
       - name: Check SERVER_PORT secret
         run: |
           if [ -z "${{ secrets.SERVER_PORT }}" ]; then
@@ -27,15 +28,15 @@ jobs:
             exit 1
           else
             echo "SERVER_PORT is set."
-            fi
+          fi
+
       - name: Deploy to server via SSH
-        uses:  appleboy/ssh-action@master
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
-          port: 22
+          port: ${{ secrets.SERVER_PORT}}
           password: ${{ secrets.SERVER_PASSWORD }}
-          
           script: |
             # 显示当前环境信息
             echo "Shell: $SHELL"
@@ -70,9 +71,7 @@ jobs:
             # 如果本地仓库不存在，进行克隆
             if [ ! -d "/home/interview-guide/.git" ]; then
               echo "Cloning the repository..."
-              # 删除可能存在的空目录内容
               rm -rf /home/interview-guide/*
-              # 使用 SSH 方式克隆
               git clone git@github.com:ccc1018/store-web-backend.git .
             else
               # 确保远程 URL 使用 SSH
@@ -96,6 +95,11 @@ jobs:
 
             # 构建项目
             pnpm run build || npm run build
+
+            # 写入 .env 文件
+            echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" > .env
+            # 如果有更多环境变量，继续追加
+            # echo "ANOTHER_SECRET=${{ secrets.ANOTHER_SECRET }}" >> .env
 
             # 重启应用
             pm2 restart interview-guide || pm2 start "pnpm start" --name interview-guide || pm2 start "npm start" --name interview-guide

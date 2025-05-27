@@ -33,11 +33,23 @@ jobs:
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SERVER_HOST }}
+            host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT}}
-          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            # 1. 自动安装 git（仅首次部署有用）
+            if ! command -v git >/dev/null 2>&1; then
+              echo "Installing git..."
+              if command -v apt >/dev/null 2>&1; then
+                sudo apt update && sudo apt install git -y
+              elif command -v yum >/dev/null 2>&1; then
+                sudo yum install git -y
+              else
+                echo "No supported package manager found. Please install git manually."
+                exit 1
+              fi
+            fi
           script: |
             # 显示当前环境信息
             echo "Shell: $SHELL"

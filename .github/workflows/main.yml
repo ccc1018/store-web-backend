@@ -1,4 +1,4 @@
-name: nest.js
+name: Deploy Next.js to Alibaba Cloud ECS
 
 on:
   push:
@@ -21,17 +21,8 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.4.0
 
-      - name: Check SERVER_PORT secret
-        run: |
-          if [ -z "${{ secrets.SERVER_PORT }}" ]; then
-            echo "SERVER_PORT is not set!"
-            exit 1
-          else
-            echo "SERVER_PORT is set."
-          fi
-
       - name: Deploy to server via SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.1
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
@@ -65,17 +56,19 @@ jobs:
             fi
 
             # 确保目标目录存在
-            mkdir -p /home/store-web-backend
-            cd /home/store-web-backend
+            mkdir -p /home/interview-guide
+            cd /home/interview-guide
 
             # 如果本地仓库不存在，进行克隆
-            if [ ! -d "/home/store-web-backend/.git" ]; then
+            if [ ! -d "/home/interview-guide/.git" ]; then
               echo "Cloning the repository..."
-              rm -rf /home/store-web-backend/*
-              git clone git@github.com:ccc1018/store-web-backend.git .
+              # 删除可能存在的空目录内容
+              rm -rf /home/interview-guide/*
+              # 使用 SSH 方式克隆
+              git clone git@github.com:xun082/interview-guide.git .
             else
               # 确保远程 URL 使用 SSH
-              git remote set-url origin git@github.com:ccc1018/store-web-backend.git
+              git remote set-url origin git@github.com:xun082/interview-guide.git
               # 获取最新代码
               git fetch origin main
               git reset --hard origin/main
@@ -97,4 +90,4 @@ jobs:
             pnpm run build || npm run build
 
             # 重启应用
-            pm2 restart store-web-backend || pm2 start "pnpm start" --name store-web-backend || pm2 start "npm start" --name store-web-backend
+            pm2 restart interview-guide || pm2 start "pnpm start" --name interview-guide || pm2 start "npm start" --name interview-guide

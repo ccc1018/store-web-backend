@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4.2.0
         with:
-          node-version: "20.10.0"
+          node-version: "22.11.0"
 
       - name: Install pnpm
         run: npm install -g pnpm@9.4.0
@@ -56,19 +56,19 @@ jobs:
             fi
 
             # 确保目标目录存在
-            mkdir -p /home/store-web-backend
-            cd /home/store-web-backend
+            mkdir -p /home/interview-guide
+            cd /home/interview-guide
 
             # 如果本地仓库不存在，进行克隆
-            if [ ! -d "/home/store-web-backend/.git" ]; then
+            if [ ! -d "/home/interview-guide/.git" ]; then
               echo "Cloning the repository..."
               # 删除可能存在的空目录内容
-              rm -rf /home/store-web-backend/*
+              rm -rf /home/interview-guide/*
               # 使用 SSH 方式克隆
-              git clone git@github.com:ccc1018/store-web-backend.git .
+              git clone git@github.com:xun082/interview-guide.git .
             else
               # 确保远程 URL 使用 SSH
-              git remote set-url origin git@github.com:ccc1018/store-web-backend.git
+              git remote set-url origin git@github.com:xun082/interview-guide.git
               # 获取最新代码
               git fetch origin main
               git reset --hard origin/main
@@ -90,4 +90,4 @@ jobs:
             pnpm run build || npm run build
 
             # 重启应用
-            pm2 restart store-web-backend || pm2 start "pnpm start" --name store-web-backend || pm2 start "npm start" --name store-web-backend
+            pm2 restart interview-guide || pm2 start "pnpm start" --name interview-guide || pm2 start "npm start" --name interview-guide

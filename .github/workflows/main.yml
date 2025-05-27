@@ -20,7 +20,14 @@ jobs:
 
       - name: Install pnpm
         run: npm install -g pnpm@9.4.0
-
+      - name: Check SERVER_PORT secret
+        run: |
+          if [ -z "${{ secrets.SERVER_PORT }}" ]; then
+            echo "SERVER_PORT is not set!"
+            exit 1
+          else
+            echo "SERVER_PORT is set."
+            fi
       - name: Deploy to server via SSH
         uses:  appleboy/ssh-action@master
         with:
@@ -28,6 +35,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           password: ${{ secrets.SERVER_PASSWORD }}
+          
           script: |
             # 显示当前环境信息
             echo "Shell: $SHELL"

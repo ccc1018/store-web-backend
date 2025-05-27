@@ -96,10 +96,5 @@ jobs:
             # 构建项目
             pnpm run build || npm run build
 
-            # 写入 .env 文件
-            echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" > .env
-            # 如果有更多环境变量，继续追加
-            # echo "ANOTHER_SECRET=${{ secrets.ANOTHER_SECRET }}" >> .env
-
             # 重启应用
-            pm2 restart interview-guide || pm2 start "pnpm start" --name interview-guide || pm2 start "npm start" --name interview-guide
+            pm2 restart store-web-backend || pm2 start "pnpm start" --name store-web-backend || pm2 start "npm start" --name store-web-backend

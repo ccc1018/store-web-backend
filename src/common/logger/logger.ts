@@ -56,7 +56,7 @@ export class Logger implements LoggerService {
         }),
         new transports.DailyRotateFile({
           //日志文件文件夹
-          dirname: process.cwd() + 'src/logs',
+          dirname: process.cwd() + '/src/logs',
           //日志文件名 %DATE%会自动设置为当前日期
           filename: 'application-%DATE%.info.log',
           //日期格式

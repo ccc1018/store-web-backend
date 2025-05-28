@@ -12,13 +12,16 @@ import { ResponseInterceptor } from './common/response/response.interceptor';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { PermissionGuardGuard } from './auth/permission-guard/permission-guard.guard';
 import { RoleModule } from './role/role.module';
-// import { MailService } from './mail/mail.service';
+import { MailService } from './mail/mail.service';
 @Module({
   imports: [
     LoggerModule,
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
+        console.log(config.get<string>('MYSQL_HOST'));
+        console.log(config.get<number>('MYSQL_PORT'));
+        console.log(config.get<string>('MYSQL_USERNAME'));
         return {
           type: 'mysql',
           host: config.get<string>('MYSQL_HOST'),
@@ -37,6 +40,10 @@ import { RoleModule } from './role/role.module';
       },
     }),
     ConfigModule.forRoot({
+      envFilePath:
+        process.env.NODE_ENV === 'development'
+          ? '.env.development'
+          : '.env.production',
       isGlobal: true,
     }),
     SysModule,
@@ -66,7 +73,7 @@ import { RoleModule } from './role/role.module';
       provide: APP_GUARD,
       useClass: PermissionGuardGuard,
     },
-    // MailService,
+    MailService,
   ],
 })
 export class AppModule {}

@@ -1,13 +1,9 @@
+// redis.module.ts
 import { Global, Module } from '@nestjs/common';
 import { createClient } from 'redis';
 import { RedisService } from './redis.service';
 import { ConfigService } from '@nestjs/config';
 
-/**
- *
- * @param config: ConfigService
- * @returns 返回已经建立的redis连接
- */
 const createRedisClient = async (config: ConfigService) => {
   return await createClient({
     socket: {
@@ -16,6 +12,7 @@ const createRedisClient = async (config: ConfigService) => {
     },
   }).connect();
 };
+
 @Global()
 @Module({
   providers: [

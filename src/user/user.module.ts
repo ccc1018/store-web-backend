@@ -6,9 +6,11 @@ import { UserEntity } from './entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { RedisModule } from 'src/common/redis/redis.module';
 
 @Module({
   imports: [
+    RedisModule,
     TypeOrmModule.forFeature([UserEntity]),
     forwardRef(() => AuthModule),
     // 新增jwt模块

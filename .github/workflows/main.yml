@@ -97,4 +97,4 @@ jobs:
             pnpm run build || npm run build
 
             # 重启应用
-            pm2 restart store-web-backend || pm2 start "pnpm start" --name store-web-backend || pm2 start "npm start" --name store-web-backend
+            pm2 restart store-web-backend || pm2 start "pnpm start:prod" --name store-web-backend || pm2 start "npm start:prod" --name store-web-backend

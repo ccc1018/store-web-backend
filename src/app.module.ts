@@ -43,7 +43,9 @@ import { MailService } from './mail/mail.service';
       envFilePath:
         process.env.NODE_ENV === 'development'
           ? '.env.development'
-          : '.env.production',
+          : process.env.NODE_ENV === 'production'
+            ? '.env.production'
+            : '.env.docker',
       isGlobal: true,
     }),
     SysModule,

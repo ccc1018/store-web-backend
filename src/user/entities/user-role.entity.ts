@@ -1,4 +1,4 @@
-// Copyright 2025 CCC
+// Copyright 2025 20711
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//Redis的key前缀
-export const enum RedisKeyPrefix {
-  //用户登录信息
-  USER_LOGIN = 'user_login:', //用户登录信息
-  //用户信息
-  USER_INFO = 'user_info:', //用户信息
-  PASSWORD_RESET = 'password_reset:', //密码重置
-  //注册邮箱验证码
-  REGISTRY_CODE = 'registry_code:',
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+@Entity('store_user_role')
+export class UserRoleEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'int', comment: '用户id' })
+  userId: number;
+
+  @Column({ type: 'int', comment: '角色id' })
+  roleId: number;
 }

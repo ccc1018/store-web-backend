@@ -4,18 +4,30 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from 'src/sys/dto/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { Repository } from 'typeorm';
-import { compare } from 'bcryptjs';
+import { DataSource, Repository } from 'typeorm';
+import { compare, genSalt, hash } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from 'src/common/types/jwt';
+import { getRediKey } from 'src/common/utils';
+import { RedisKeyPrefix } from 'src/common/enums/redis-key.enum';
+import { RedisService } from 'src/common/redis/redis.service';
+import { plainToClass } from 'class-transformer';
+import { RoleEntity } from 'src/role/entities/role.entity';
+import { UserRoleEntity } from './entities/user-role.entity';
 @Injectable()
 export class UserService {
+  @Inject(RedisService)
+  private redisService: RedisService;
   @InjectRepository(UserEntity)
   private userRepository: Repository<UserEntity>;
+  @InjectRepository(UserRoleEntity)
+  private userRoleRepository: Repository<UserRoleEntity>;
 
   @Inject(JwtService)
   private jwtService: JwtService;
+  @Inject(DataSource)
+  private dataSource: DataSource;
   constructor(private configService: ConfigService) {}
   async login(loginUserDto: LoginUserDto) {
     const user = await this.userRepository.findOne({
@@ -60,7 +72,6 @@ export class UserService {
   }
   async registry(createUserDto: CreateUserDto) {
     const { username, email } = createUserDto;
-
     //1.判断用户是否存在，参数为邮箱或者用户名查询，使用createQueryBuilder一次性查询两个字段
     const user = await this.userRepository
       .createQueryBuilder('su')
@@ -77,11 +88,49 @@ export class UserService {
       );
     }
     //3.校验注册验证码
-    // const codeRedDisKey = getRedisKey(
-
-    // )
+    const codeRedDisKey = getRediKey(
+      RedisKeyPrefix.REGISTRY_CODE,
+      createUserDto.email,
+    );
+    const code = await this.redisService.get(codeRedDisKey);
+    console.log('注册验证码:', code);
+    if (!code || code !== createUserDto.code) {
+      throw new HttpException(
+        '验证码错误或已过期，请重新获取',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+    const salt = await genSalt();
+    createUserDto.password = await hash(createUserDto.password, salt);
+    const newUser = plainToClass(
+      UserEntity,
+      { salt, ...createUserDto },
+      { ignoreDecorators: true },
+    );
+    // 3. 不存在则创建用户
+    console.log('注册用户信息:', newUser);
+    const savedUser = await this.userRepository.save(newUser);
+    // 4. 缓存用户信息
+    const redisKey = getRediKey(RedisKeyPrefix.USER_INFO, savedUser.id);
+    console.log('缓存用户信息:', redisKey);
+    await this.redisService.set(
+      redisKey,
+      JSON.stringify(savedUser),
+      60 * 60 * 24,
+    ); // 缓存一天
+    //5.分配当前用户默认权限
+    const defaultRole = await this.dataSource
+      .createQueryBuilder(RoleEntity, 'role')
+      .where('role.name =:name', { name: '服务员' })
+      .getOne();
+    if (defaultRole) {
+      await this.userRoleRepository.save({
+        userId: savedUser.id,
+        roleId: defaultRole.id,
+      });
+    }
     return {
-      data: user,
+      data: plainToClass(UserEntity, savedUser),
     };
   }
   async getCurrentUser(currentUser: UserEntity) {
@@ -91,7 +140,6 @@ export class UserService {
         id: currentUser.id,
       },
     });
-    // const { password, ...rest } = user;
     return user;
   }
   create(createUserDto: CreateUserDto) {

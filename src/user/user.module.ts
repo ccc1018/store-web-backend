@@ -7,11 +7,13 @@ import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RedisModule } from 'src/common/redis/redis.module';
+import { RoleEntity } from 'src/role/entities/role.entity';
+import { UserRoleEntity } from './entities/user-role.entity';
 
 @Module({
   imports: [
     RedisModule,
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, RoleEntity, UserRoleEntity]),
     forwardRef(() => AuthModule),
     // 新增jwt模块
     JwtModule.registerAsync({

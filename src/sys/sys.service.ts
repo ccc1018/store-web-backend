@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { RedisKeyPrefix } from 'src/common/enums/redis-key.enum';
 import { RedisService } from 'src/common/redis/redis.service';
-
+import { getRediKey } from 'src/common/utils';
 import { MailService } from 'src/mail/mail.service';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class SysService {
@@ -11,6 +15,8 @@ export class SysService {
   @Inject(RedisService)
   private redisService: RedisService;
 
+  @InjectRepository(UserEntity)
+  private userRepository: Repository<UserEntity>;
   /**
    *
    * @param email 邮箱地址
@@ -21,10 +27,9 @@ export class SysService {
     const { code } = (await this.mailService.sendMail(email, text)) as {
       code: string;
     };
-    console.log(code);
-    // const redisKey = getRedisKey()
-    console.log(email, text);
-    return '发送成功';
+    const redisKey = getRediKey(RedisKeyPrefix.REGISTRY_CODE, email);
+    await this.redisService.set(redisKey, code, 60 * 5);
+    return '验证码已发送至邮箱，请注意查收';
   }
   findAll() {
     return `This action returns all sys`;

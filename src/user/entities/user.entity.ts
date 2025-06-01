@@ -19,9 +19,10 @@ export class UserEntity {
     nullable: false,
     comment: '用户登录密码',
   })
+  @Exclude()
   @Exclude({ toPlainOnly: true })
-  public password: string;
-
+  password: string;
+  @Exclude()
   @Column({
     type: 'varchar',
     length: 50,

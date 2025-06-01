@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export function getRediKey(moduleKey, id?: number | string) {
+import { RedisKeyPrefix } from '../enums/redis-key.enum';
+
+export function getRediKey(moduleKey: RedisKeyPrefix, id?: number | string) {
   return `${moduleKey}${id || ''}`;
 }
 export interface ListToTreeOptions {
   root?: string | number;
   pidKey?: string;
+  idKey?: string;
+  childKey?: string;
 }

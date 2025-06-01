@@ -5,6 +5,8 @@ import { RedisService } from './redis.service';
 import { ConfigService } from '@nestjs/config';
 
 const createRedisClient = async (config: ConfigService) => {
+  console.log(config.get<string>('REDIS_HOST'));
+  console.log(config.get<string>('REDIS_PORT'));
   return await createClient({
     socket: {
       host: config.get<string>('REDIS_HOST'),
